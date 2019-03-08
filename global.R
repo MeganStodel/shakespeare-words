@@ -3,12 +3,12 @@ library(data.table)
 library(tidytext)
 library(dplyr)
 library(shiny)
-library(shinydashboard)
+library(rio)
 
 # Obtain the metadata for Shakespeare plays
 
 shake_metadata <- as.data.table(gutenberg_works(author == "Shakespeare, William") %>%
-  filter(gutenberg_id >= 1500 & gutenberg_id <= 1541 & gutenberg_id != 1505 & gutenberg_id != 1525))
+                                  filter(gutenberg_id >= 1500 & gutenberg_id <= 1541 & gutenberg_id != 1505 & gutenberg_id != 1525))
 
 # Download plays
 

@@ -5,35 +5,54 @@ function(input, output, session) {
   setnames(word_in_plays, "N", "focus_word_freq")
   return(word_in_plays)
   })
+  
+  # Total number of times the word is used
+  
+  output$word_total <- renderText({
+    req(input$focus_word != "")
+    paste0("Shakespeare used the word ", input$focus_word, " ",
+      shake_words[word == input$focus_word, .N], " times in his plays.")
+  })
 
 # Find play that uses word most
 
-output$word_frequency <- renderInfoBox({
-  infoBox(
-    title = paste0("Play that uses ", input$focus_word, " most often"),
-    word_in_plays()[, title][1]
-    )
+output$word_frequency <- renderText({
+  req(input$focus_word != "")
+  req(input$focus_word %in% shake_words$word)
+    paste0("The play that uses the word ", input$focus_word, " most often is ",
+    word_in_plays()[, title][1], ", which uses it ", word_in_plays()[, focus_word_freq][1], " times.")
 })
 
 
 # Find play that proportionally uses word most
 
-output$word_proportional <- renderInfoBox({
+word_props <- reactive({
+  req(input$focus_word != "")
+  req(input$focus_word %in% shake_words$word)
   word_props <- merge(all_words, word_in_plays(), all.x = T)
   word_props <- word_props[is.na(focus_word_freq), focus_word_freq := 0]
   word_props <- word_props[, focus_word_prop := focus_word_freq/total_words*100][order(-focus_word_prop)]
-  infoBox(
-    title = paste0("Play in which ", input$focus_word, " is used most densely"),
-    word_props[, title][1]
-  )
+  return(word_props)
+})
+
+output$word_proportional <- renderText({
+  req(input$focus_word != "")
+  req(input$focus_word %in% shake_words$word)
+  paste0("The play in which the word ", input$focus_word, " is used most densely is ",
+    word_props()[, title][1], ", which uses it ", 
+    word_in_plays()[title == word_props()[, title][1], focus_word_freq], " times in its ",
+  all_words[title == word_props()[, title][1], total_words], " words. ")
 })
 
 
 # Generate a random line using word
 
 output$random_line <- renderText({
-  sentences_with_word <- shake_sentence[grepl(input$focus_word, sentence)]
-  random_sentence <- sentences_with_word[sample(nrow(sentences_with_word), 1), sentence]
+  req(input$focus_word != "")
+  req(input$focus_word %in% shake_words$word)
+  sentences_with_word <- shake_sentence[grepl(paste0("\\b", input$focus_word, "\\b"), sentence)]
+  random_sentence <- paste0('"', sentences_with_word[sample(nrow(sentences_with_word), 1), sentence], '"\n- ',
+                            sentences_with_word[sample(nrow(sentences_with_word), 1), title])
   return(random_sentence)
 })
 

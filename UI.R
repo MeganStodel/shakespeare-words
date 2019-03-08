@@ -1,14 +1,12 @@
-body <- dashboardBody(
+fluidPage(
+  title = "Words in Shakespeare's plays",
 
-  textInput("focus_word", "The most lamentable tragedy of "),
-  infoBoxOutput("word_frequency"),
-  infoBoxOutput("word_proportional"),
+  textInput("focus_word", "Which word do you want to know about?"),
+  hr(),
+  textOutput("word_total"),
+  textOutput("word_frequency"),
+  textOutput("word_proportional"),
+  hr(),
   textOutput("random_line")
-  
-)
 
-dashboardPage(
-  dashboardHeader(title = "Words in Shakespeare"),
-  dashboardSidebar(),
-  body
 )
