@@ -75,7 +75,7 @@ output$random_line <- renderUI({
   req(focus_word() %in% shake_words$word)
   sentences_with_word <- copy(shake_sentence)[grepl(paste0("\\b", input$focus_word, "\\b"), sentence, ignore.case = T)]
   select_sentence <- sentences_with_word[sample(nrow(sentences_with_word), 1)]
-  random_sentence <- HTML(paste0('"', select_sentence[, sentence], "<br /><font size = 4> - ", select_sentence[, title]))
+  random_sentence <- HTML(paste0('"', select_sentence[, sentence], "<br /><font size = 4> - ", select_sentence[, title], '"'))
   return(random_sentence)
 })
 

@@ -43,5 +43,5 @@ all_type_words <- all_words[, sum(total_words), by = type]
 
 shake_sentence <- unnest_tokens(shake_plays, sentence, text, token = "sentences", to_lower = FALSE)
 
-shake_sentence <- shake_sentence[!grepl("^\\[", sentence) & !grepl("^[A-Z]{2,}", sentence)]
+shake_sentence <- shake_sentence[!grepl("^\\[", sentence) & !grepl("^[A-Z]{2,}", sentence) & !grepl("^\\d", sentence)]
 
