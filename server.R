@@ -1,7 +1,9 @@
 function(input, output, session) {
   
+  focus_word <- reactive({tolower(input$focus_word)})
+  
   word_in_plays <- reactive({
-    word_in_plays <- shake_words[word == input$focus_word, .N, by = title][order(-N)]
+    word_in_plays <- shake_words[word == focus_word(), .N, by = title][order(-N)]
   setnames(word_in_plays, "N", "focus_word_freq")
   return(word_in_plays)
   })
@@ -12,8 +14,8 @@ function(input, output, session) {
     req(input$focus_word != "")
     HTML(paste0("<div id='mydiv'>", "Shakespeare used the word \"", input$focus_word, "\" ",
            "<f><font size = 5><b>", 
-           prettyNum(shake_words[word == input$focus_word, .N], big.mark = ","), "</f></font></b>",
-           ifelse(shake_words[word == input$focus_word, .N] == 1, " time", " times") , " in his plays.", "</div>")
+           prettyNum(shake_words[word == focus_word(), .N], big.mark = ","), "</f></font></b>",
+           ifelse(shake_words[word == focus_word(), .N] == 1, " time", " times") , " in his plays.", "</div>")
     )
   })
 
@@ -26,7 +28,7 @@ top_plays <- reactive({
 
 output$word_frequency <- renderUI({
   req(input$focus_word != "")
-  req(input$focus_word %in% shake_words$word)
+  req(focus_word() %in% shake_words$word)
   if(length(top_plays()) == 1) {
     HTML(paste0("<div id='mydiv'>", "The play that uses the word \"", input$focus_word, "\" most often is ",
                 "<f><font size = 5><b>", top_plays(), "</f></font></b>", ", which uses it ", 
@@ -60,7 +62,7 @@ focus_type <- reactive({
 
 output$word_playtype <- renderUI({
   req(input$focus_word != "")
-  req(input$focus_word %in% shake_words$word)
+  req(focus_word() %in% shake_words$word)
   HTML(paste0("<div id='mydiv'>", "<f><font size = 5><b>", focus_type(), 
               "</f></font></b>", " most often use the word \"", input$focus_word, "\", relative to their total number of words.")
   )
@@ -70,12 +72,12 @@ output$word_playtype <- renderUI({
 
 output$random_line <- renderUI({
   req(input$focus_word != "")
-  req(input$focus_word %in% shake_words$word)
-  sentences_with_word <- shake_sentence[grepl(paste0("\\b", input$focus_word, "\\b"), sentence, ignore.case = T)]
-  random_sentence <- HTML(paste0('"', sentences_with_word[sample(nrow(sentences_with_word), 1), sentence], 
-                                 "<br /><font size = 4> - ",
-                            sentences_with_word[sample(nrow(sentences_with_word), 1), title]))
+  req(focus_word() %in% shake_words$word)
+  sentences_with_word <- copy(shake_sentence)[grepl(paste0("\\b", input$focus_word, "\\b"), sentence, ignore.case = T)]
+  select_sentence <- sentences_with_word[sample(nrow(sentences_with_word), 1)]
+  random_sentence <- HTML(paste0('"', select_sentence[, sentence], "<br /><font size = 4> - ", select_sentence[, title]))
   return(random_sentence)
 })
 
 }
+
