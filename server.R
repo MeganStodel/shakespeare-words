@@ -54,9 +54,9 @@ focus_type <- reactive({
                                                               ifelse(title %in% tragedies, "Tragedies", "Problem plays")
                                                        )
   )]
-  word_in_type <- word_in_type[, total := sum(focus_word_freq), by = type]
   word_in_type <- merge(word_in_type, all_type_words, by = "type")
-  word_in_type <- word_in_type[, proportion := total/V1][order(-proportion)][1]
+  word_in_type[, proportion := total/V1]
+  word_in_type[proportion == max(proportion), type][1]
   return(word_in_type$type)
 })
 
