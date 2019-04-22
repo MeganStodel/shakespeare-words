@@ -1,8 +1,14 @@
-library(gutenbergr)
+# profvis
+
+library(profvis)
+
+profvis({
+
 library(data.table)
 library(tidytext)
-library(dplyr)
 library(shiny)
+
+
 
 # Play types
 
@@ -19,14 +25,9 @@ tragedies <- c("The Tragedy of Titus Andronicus", "Romeo and Juliet", "Julius Ca
              "The Tragedy of Coriolanus", "The Life of Timon of Athens", "Cymbeline")
 
 
-# Obtain the metadata for Shakespeare plays
-
-shake_metadata <- as.data.table(gutenberg_works(author == "Shakespeare, William") %>%
-                                  filter(gutenberg_id >= 1500 & gutenberg_id <= 1541 & gutenberg_id != 1505 & gutenberg_id != 1525))
-
 # Download plays
 
-shake_plays <- as.data.table(gutenberg_download(shake_metadata$gutenberg_id, meta_fields = "title")) # 181,648 rows
+shake_plays <- as.data.table(read_feather("shake_plays.feather")) # 181,648 rows
 
 # Unnest into sentences and remove obvious scene info
 
@@ -51,4 +52,6 @@ all_words[, type := ifelse(title %in% comedies, "Comedies",
                            )]
 
 all_type_words <- all_words[, sum(total_words), by = type]
+
+})
 
