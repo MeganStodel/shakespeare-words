@@ -1,7 +1,6 @@
-library(gutenbergr)
+library(feather)
 library(data.table)
 library(tidytext)
-library(dplyr)
 library(shiny)
 
 # Play types
@@ -19,36 +18,11 @@ tragedies <- c("The Tragedy of Titus Andronicus", "Romeo and Juliet", "Julius Ca
              "The Tragedy of Coriolanus", "The Life of Timon of Athens", "Cymbeline")
 
 
-# Obtain the metadata for Shakespeare plays
+# Download datasets
 
-shake_metadata <- as.data.table(gutenberg_works(author == "Shakespeare, William") %>%
-                                  filter(gutenberg_id >= 1500 & gutenberg_id <= 1541 & gutenberg_id != 1505 & gutenberg_id != 1525))
-
-# Download plays
-
-shake_plays <- as.data.table(gutenberg_download(shake_metadata$gutenberg_id, meta_fields = "title")) # 181,648 rows
-
-# Unnest into sentences and remove obvious scene info
-
-shake_sentence <- unnest_tokens(shake_plays, sentence, text, token = "sentences", to_lower = FALSE)
-
-shake_sentence <- shake_sentence[!grepl("^\\[", sentence) & !grepl("^[A-Z]{2,}", sentence) & !grepl("^\\d", sentence)]
-
-# Unnest into words
-
-shake_words <- unnest_tokens(shake_sentence, word, sentence)
-
-# Sum words in plays
-
-all_words <- shake_words[, .(total_words = .N), by = title]
-
-# Sum words in play types
-
-all_words[, type := ifelse(title %in% comedies, "Comedies", 
-                           ifelse(title %in% histories, "Histories", 
-                                  ifelse(title %in% tragedies, "Tragedies", "Problem plays")
-                                  )
-                           )]
-
-all_type_words <- all_words[, sum(total_words), by = type]
+shake_plays <- as.data.table(read_feather("shake_plays.feather")) # 181,648 rows
+shake_sentence <- as.data.table(read_feather("shake_sentence.feather"))
+shake_words <- as.data.table(read_feather("shake_words.feather"))
+all_words <- as.data.table(read_feather("all_words.feather"))
+all_type_words <- as.data.table(read_feather("all_type_words.feather"))
 
