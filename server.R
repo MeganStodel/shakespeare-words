@@ -75,7 +75,8 @@ output$word_playtype <- renderUI({
 output$random_line <- renderUI({
   req(input$focus_word != "")
   req(focus_word() %in% shake_words$word)
-  sentences_with_word <- copy(shake_sentence)[grepl(paste0("\\b", input$focus_word, "\\b"), sentence, ignore.case = T)]
+  sentences_with_word <- copy(shake_sentence)[grepl(paste0("\\b", input$focus_word, "(?=[\\s\\.\\!\\?]|$)"), 
+                                                    sentence, ignore.case = T, perl = TRUE)]
   select_sentence <- sentences_with_word[sample(nrow(sentences_with_word), 1)]
   select_sentence[, sentence := gsub("^[a-z]", toupper(substring(sentence, 1, 1)), sentence)]
   random_sentence <- HTML(paste0("\"", select_sentence[, sentence], 

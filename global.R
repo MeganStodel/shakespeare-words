@@ -20,8 +20,6 @@ tragedies <- c("The Tragedy of Titus Andronicus", "Romeo and Juliet", "Julius Ca
 
 # Download datasets
 
-shake_plays <- as.data.table(read_feather("shake_plays.feather")) # 181,648 rows
 shake_sentence <- as.data.table(read_feather("shake_sentence.feather"))
 shake_words <- as.data.table(read_feather("shake_words.feather"))
-all_words <- as.data.table(read_feather("all_words.feather"))
 all_type_words <- as.data.table(read_feather("all_type_words.feather"))
